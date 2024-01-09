@@ -10,7 +10,7 @@ import fragment from './shaders/fragment.glsl'
  */
 // Debug
 const gui = new GUI()
-
+gui.hide()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -29,8 +29,8 @@ parameters.branches = 40
 parameters.spin = 1
 parameters.randomness = 0.1
 parameters.randomnessPower = 10
-parameters.insideColor = '#5031ff'
-parameters.outsideColor = '#e33ecb'
+parameters.insideColor = '#3cf440'
+parameters.outsideColor = '#0147eb'
 
 let geometry = null
 let material = null
@@ -165,7 +165,7 @@ window.addEventListener('resize', () =>
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
 camera.position.x = 8
-camera.position.y = 3
+camera.position.y = 1
 camera.position.z = 0
 
 scene.add(camera)
@@ -196,8 +196,8 @@ generateGalaxy()
 const clock = new THREE.Clock()
 
 // Camera rotation parameters
-const radius = 8; // radius of the circle
-let angle = 0; // start angle
+const radius = 10; // radius of the circle
+let angle = .5; // start angle
 const speed = 0.001 / 2; // rotation speed
 
 const tick = () =>

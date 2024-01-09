@@ -26,7 +26,7 @@ void main()
 
     modelPosition.x += aRandom.x; 
     modelPosition.y += aRandom.y; 
-    modelPosition.z += aRandom.z * uTime * 0.02;
+    modelPosition.z += aRandom.z * uTime * 1.0;
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
