@@ -2,14 +2,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 
-import vertex from './shaders/vertex.glsl'
-import fragment from './shaders/fragment.glsl'
+// Shaders 
+import waterVertexShader from './shaders/water/vertex.glsl'
+import waterFragmentShader from './shaders/water/fragment.glsl'
 
 /**
  * Base
  */
 // Debug
-const gui = new GUI()
+const gui = new GUI({ width: 340 })
+const debugObject = {}
+//gui.hide()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -18,120 +21,60 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Galaxy
+ * Water
  */
-const parameters = {}
-parameters.count = 200000
-parameters.size = 0.005
-parameters.radius = 5
-parameters.branches = 3
-parameters.spin = 1
-parameters.randomness = 0.5
-parameters.randomnessPower = 3
-parameters.insideColor = '#ff6030'
-parameters.outsideColor = '#1b3984'
+// Geometry
+const waterGeometry = new THREE.PlaneGeometry(2, 2, 200, 200)
+const sphereGeometry = new THREE.SphereGeometry(15, 32,)
 
-let geometry = null
-let material = null
-let points = null
+// Colors
+debugObject.depthColor = '#ab5454'
+debugObject.surfaceColor = '#ff3737'
 
-const generateGalaxy = () =>
-{
-    if(points !== null)
+
+// Material
+const waterMaterial = new THREE.ShaderMaterial({
+    vertexShader: waterVertexShader,
+    fragmentShader: waterFragmentShader,
+    uniforms:
     {
-        geometry.dispose()
-        material.dispose()
-        scene.remove(points)
-    }
+        uTime: { value: 0 },
+        uBigWavesElevation: { value: 0.136 },
+        uBigWavesFrequency: { value: new THREE.Vector2(23, 19) },
+        uBigWavesSpeed: { value: 0.5 },
+        uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
+        uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
+        uColorOffset: { value: 0.08 },
+        uColorMultiplier: { value: 5 },
+        uSmallWavesElevation: { value: 0.422 },
+        uSmallWavesFrequency: { value: 9.884 },
+        uSmallWavesSpeed: { value: .1 },
+        uSmallIterations: { value: 1 },
+    },
+    wireframe: true,
+})
 
-    /**
-     * Geometry
-     */
-    geometry = new THREE.BufferGeometry()
+waterMaterial.fog = false;
 
-    const positions = new Float32Array(parameters.count * 3)
-    const colors = new Float32Array(parameters.count * 3)
-    const scales = new Float32Array(parameters.count * 1)
-    const random = new Float32Array(parameters.count * 3)
 
-    const insideColor = new THREE.Color(parameters.insideColor)
-    const outsideColor = new THREE.Color(parameters.outsideColor)
+gui.add(waterMaterial.uniforms.uBigWavesElevation, 'value').min(0).max(1).step(0.001).name('uBigWavesElevation')
+gui.add(waterMaterial.uniforms.uBigWavesFrequency.value, 'x').min(0).max(50).step(0.001).name('uBigWavesFrequencyX')
+gui.add(waterMaterial.uniforms.uBigWavesFrequency.value, 'y').min(0).max(50).step(0.001).name('uBigWavesFrequencyY')
 
-    for(let i = 0; i < parameters.count; i++)
-    {
-        const i3 = i * 3
+gui.add(waterMaterial.uniforms.uBigWavesSpeed, 'value').min(0).max(4).step(0.001).name('uBigWavesSpeed')
 
-        // Position
-        const radius = Math.random() * parameters.radius
+gui.addColor(debugObject, 'depthColor').onChange(() => { waterMaterial.uniforms.uDepthColor.value.set(debugObject.depthColor) })
+gui.addColor(debugObject, 'surfaceColor').onChange(() => { waterMaterial.uniforms.uSurfaceColor.value.set(debugObject.surfaceColor) })
 
-        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2
+gui.add(waterMaterial.uniforms.uSmallWavesElevation, 'value').min(0).max(1).step(0.001).name('uSmallWavesElevation')
+gui.add(waterMaterial.uniforms.uSmallWavesFrequency, 'value').min(0).max(30).step(0.001).name('uSmallWavesFrequency')
+gui.add(waterMaterial.uniforms.uSmallWavesSpeed, 'value').min(0).max(4).step(0.001).name('uSmallWavesSpeed')
+gui.add(waterMaterial.uniforms.uSmallIterations, 'value').min(0).max(5).step(1).name('uSmallIterations')
 
-        positions[i3    ] = Math.cos(branchAngle) * radius
-        positions[i3 + 1] = 0
-        positions[i3 + 2] = Math.sin(branchAngle) * radius
-
-        // Random 
-        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
-        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
-        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
-
-        random[i3] = randomX
-        random[i3 + 1] = randomY 
-        random[i3 + 2] = randomZ
-
-        // Color
-        const mixedColor = insideColor.clone()
-        mixedColor.lerp(outsideColor, radius / parameters.radius)
-
-        colors[i3    ] = mixedColor.r
-        colors[i3 + 1] = mixedColor.g
-        colors[i3 + 2] = mixedColor.b
-
-        // Scale
-        scales[i] = Math.random()
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1))
-    geometry.setAttribute('aRandom', new THREE.BufferAttribute(random, 3))
-
-    /**
-     * Material
-     */
-    // material = new THREE.PointsMaterial({
-    //     size: parameters.size,
-    //     sizeAttenuation: true,
-    //     depthWrite: false,
-    //     blending: THREE.AdditiveBlending,
-    //     vertexColors: true
-    // })
-
-        material = new THREE.ShaderMaterial({
-            depthWrite: false, 
-            blending: THREE.AdditiveBlending, 
-            vertexColors: true, 
-            vertexShader: vertex, 
-            fragmentShader: fragment, 
-            uniforms: {
-                uSize: { value: 30 * renderer.getPixelRatio() },
-                uTime: { value: 0 }, 
-            }
-        })
-    /**
-     * Points
-     */
-    points = new THREE.Points(geometry, material)
-    scene.add(points)
-}
-
-gui.add(parameters, 'count').min(100).max(1000000).step(100).onFinishChange(generateGalaxy)
-gui.add(parameters, 'radius').min(0.01).max(20).step(0.01).onFinishChange(generateGalaxy)
-gui.add(parameters, 'branches').min(2).max(20).step(1).onFinishChange(generateGalaxy)
-gui.add(parameters, 'randomness').min(0).max(2).step(0.001).onFinishChange(generateGalaxy)
-gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).onFinishChange(generateGalaxy)
-gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy)
-gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy)
+// Mesh
+const water = new THREE.Mesh(waterGeometry, waterMaterial)
+water.rotation.x = - Math.PI * 0.5
+scene.add(water)
 
 /**
  * Sizes
@@ -153,7 +96,7 @@ window.addEventListener('resize', () =>
 
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))  
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
 /**
@@ -161,9 +104,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 3
-camera.position.y = 3
-camera.position.z = 3
+camera.position.set(0, 1.3, 0)
 scene.add(camera)
 
 // Controls
@@ -179,26 +120,46 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-generateGalaxy()
-
 /**
  * Animate
  */
 const clock = new THREE.Clock()
 
+
+let angle = 0 
+const radius = 0.01
+const speed = 0.01/4
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+    
+    // Calculate the camera's new position
+    // angle += speed;
+    // camera.position.x = Math.sin(angle) * radius;
+    // camera.position.z = Math.cos(angle) * radius;
 
-    material.uniforms.uTime.value = elapsedTime;
+    // // Make the camera look at the center of the scene
+    // camera.lookAt(scene.position);
+
+
+    waterMaterial.uniforms.uTime.value = elapsedTime
+
+
     // Update controls
     controls.update()
 
     // Render
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+    setTimeout( function() {
+
+         // Call tick again on the next frame
+        window.requestAnimationFrame(tick)
+
+    }, 1000 / 30 );
+   
+    
 }
 
 tick()

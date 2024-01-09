@@ -31,7 +31,7 @@ scene.fog = new THREE.Fog(color, near, far);
  * Water
  */
 // Geometry
-const waterGeometry = new THREE.PlaneGeometry(4, 4, 200, 200)
+const waterGeometry = new THREE.PlaneGeometry(2, 2, 200, 200)
 
 
 // Colors
@@ -145,12 +145,12 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     
     // Calculate the camera's new position
-    angle += speed;
-    camera.position.x = Math.sin(angle) * radius;
-    camera.position.z = Math.cos(angle) * radius;
+    // angle += speed;
+    // camera.position.x = Math.sin(angle) * radius;
+    // camera.position.z = Math.cos(angle) * radius;
 
-    // Make the camera look at the center of the scene
-    camera.lookAt(scene.position);
+    // // Make the camera look at the center of the scene
+    // camera.lookAt(scene.position);
 
 
     waterMaterial.uniforms.uTime.value = elapsedTime
