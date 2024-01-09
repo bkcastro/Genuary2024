@@ -22,7 +22,7 @@ const scene = new THREE.Scene()
  * Galaxy
  */
 const parameters = {}
-parameters.count = 1000000
+parameters.count = 600000
 parameters.size = 0.005
 parameters.radius = 5
 parameters.branches = 40
