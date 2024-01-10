@@ -6,7 +6,6 @@ import GUI from 'lil-gui'
  */
 // Debug
 const gui = new GUI({ width: 340 })
-gui.hide()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -19,7 +18,6 @@ const material = new THREE.MeshBasicMaterial( { color: 0xe21d1d } );
 let mesh = new THREE.Mesh( geometry, material );
 mesh.rotateX(Math.PI / 2);
 scene.add( mesh );
-
 
 gui.addColor(material, 'color')
 
