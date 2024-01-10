@@ -1,18 +1,12 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-
-// Shaders 
-import waterVertexShader from './shaders/water/vertex.glsl'
-import waterFragmentShader from './shaders/water/fragment.glsl'
-
 /**
  * Base
  */
 // Debug
 const gui = new GUI({ width: 340 })
-const debugObject = {}
-//gui.hide()
+gui.hide()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -20,61 +14,50 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-/**
- * Water
- */
-// Geometry
-const waterGeometry = new THREE.PlaneGeometry(2, 2, 200, 200)
-const sphereGeometry = new THREE.SphereGeometry(15, 32,)
-
-// Colors
-debugObject.depthColor = '#ab5454'
-debugObject.surfaceColor = '#ff3737'
+let geometry = new THREE.CylinderGeometry(3, 3, 1, 60, 60);
+const material = new THREE.MeshBasicMaterial( { color: 0xe21d1d } );
+let mesh = new THREE.Mesh( geometry, material );
+mesh.rotateX(Math.PI / 2);
+scene.add( mesh );
 
 
-// Material
-const waterMaterial = new THREE.ShaderMaterial({
-    vertexShader: waterVertexShader,
-    fragmentShader: waterFragmentShader,
-    uniforms:
-    {
-        uTime: { value: 0 },
-        uBigWavesElevation: { value: 0.136 },
-        uBigWavesFrequency: { value: new THREE.Vector2(23, 19) },
-        uBigWavesSpeed: { value: 0.5 },
-        uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
-        uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
-        uColorOffset: { value: 0.08 },
-        uColorMultiplier: { value: 5 },
-        uSmallWavesElevation: { value: 0.422 },
-        uSmallWavesFrequency: { value: 9.884 },
-        uSmallWavesSpeed: { value: .1 },
-        uSmallIterations: { value: 1 },
-    },
-    wireframe: true,
-})
+gui.addColor(material, 'color')
 
-waterMaterial.fog = false;
+material.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `
+            #include <common>
+
+            mat2 get2dRotateMatrix(float _angle)
+            {
+                return mat2(cos(_angle), - sin(_angle), sin(_angle), cos(_angle));
+            }
+        `
+    )
 
 
-gui.add(waterMaterial.uniforms.uBigWavesElevation, 'value').min(0).max(1).step(0.001).name('uBigWavesElevation')
-gui.add(waterMaterial.uniforms.uBigWavesFrequency.value, 'x').min(0).max(50).step(0.001).name('uBigWavesFrequencyX')
-gui.add(waterMaterial.uniforms.uBigWavesFrequency.value, 'y').min(0).max(50).step(0.001).name('uBigWavesFrequencyY')
+    shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `
+            #include <begin_vertex>
+    
+            float angle = position.y * 0.3;
+            mat2 rotateMatrix = get2dRotateMatrix(angle);
 
-gui.add(waterMaterial.uniforms.uBigWavesSpeed, 'value').min(0).max(4).step(0.001).name('uBigWavesSpeed')
+            transformed.xz = rotateMatrix * transformed.yz;
+        `
+    )
+}
 
-gui.addColor(debugObject, 'depthColor').onChange(() => { waterMaterial.uniforms.uDepthColor.value.set(debugObject.depthColor) })
-gui.addColor(debugObject, 'surfaceColor').onChange(() => { waterMaterial.uniforms.uSurfaceColor.value.set(debugObject.surfaceColor) })
+let star = null;
 
-gui.add(waterMaterial.uniforms.uSmallWavesElevation, 'value').min(0).max(1).step(0.001).name('uSmallWavesElevation')
-gui.add(waterMaterial.uniforms.uSmallWavesFrequency, 'value').min(0).max(30).step(0.001).name('uSmallWavesFrequency')
-gui.add(waterMaterial.uniforms.uSmallWavesSpeed, 'value').min(0).max(4).step(0.001).name('uSmallWavesSpeed')
-gui.add(waterMaterial.uniforms.uSmallIterations, 'value').min(0).max(5).step(1).name('uSmallIterations')
+function generateStar() {
 
-// Mesh
-const water = new THREE.Mesh(waterGeometry, waterMaterial)
-water.rotation.x = - Math.PI * 0.5
-scene.add(water)
+    if (star != null) {
+
+    }
+}   
 
 /**
  * Sizes
@@ -103,8 +86,8 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0, 1.3, 0)
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 2000)
+camera.position.set(400,0, 0)
 scene.add(camera)
 
 // Controls
@@ -130,6 +113,10 @@ let angle = 0
 const radius = 0.01
 const speed = 0.01/4
 
+let height = 1
+let goBack = false
+const cap = 600; 
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
@@ -142,10 +129,32 @@ const tick = () =>
     // // Make the camera look at the center of the scene
     // camera.lookAt(scene.position);
 
+    scene.remove(mesh) 
+    geometry.dispose() 
 
-    waterMaterial.uniforms.uTime.value = elapsedTime
 
+    if (goBack) {
+        height -= .5
+    } else {
+        height += .5
+    }
+    
 
+    if (height >= cap || height <= 0) {
+        //console.log("hi")
+        if(!goBack) {
+            goBack = true
+        } else {
+            goBack = false
+        }
+    }
+
+    //console.log(height)
+
+    geometry = new THREE.CylinderGeometry(10, 10, height, 50, 50)
+    mesh = new THREE.Mesh( geometry, material )
+    mesh.rotateX(Math.PI / 2);
+    scene.add(mesh)
     // Update controls
     controls.update()
 
@@ -157,9 +166,8 @@ const tick = () =>
          // Call tick again on the next frame
         window.requestAnimationFrame(tick)
 
-    }, 1000 / 30 );
+    }, 1000 / 60 );
    
-    
 }
 
 tick()
