@@ -10,6 +10,7 @@ import fragment from './shaders/fragment.glsl'
  */
 // Debug
 const gui = new GUI({ width: 340 })
+gui.hide();
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -47,7 +48,7 @@ const material = new THREE.ShaderMaterial({
         uTime: { value: 0 },
         color1: { value: new THREE.Color("red") },
         color2: { value: new THREE.Color("#05ff50") },
-        percentage: { value: 0 },
+        uDuration: { value: 5 },
     },
     wireframe: true, 
 })
@@ -90,20 +91,6 @@ controls.enableDamping = true
  * Animate
  */
 const clock = new THREE.Clock()
-const timer = new THREE.Clock()
-
-let angle = 0 
-const radius = 0.01
-const speed = 0.01/4
-
-// Calculate the camera's new position
-    // angle += speed;
-    // camera.position.x = Math.sin(angle) * radius;
-    // camera.position.z = Math.cos(angle) * radius;
-
-    // // Make the camera look at the center of the scene
-    // camera.lookAt(scene.position);
-    //console.log(height)
 
 const tick = () =>
 {
