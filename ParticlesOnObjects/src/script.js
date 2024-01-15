@@ -2,10 +2,6 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import vertex from './shaders/vertex.glsl'
-import fragment from './shaders/fragment.glsl'
-import { pingpong } from 'three/src/math/MathUtils'
-
 /**
  * Base
  */
