@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 
-import { Core, Stripes, Boxes } from './objects.js'
+import { Core, Stripes, Boxes, Board } from './objects.js'
 import css from 'styled-jsx/css'
 
 /**
@@ -88,6 +88,9 @@ for (var i = 0; i < 50; i++) {
 
     scene.add(boxes.group);
 }
+
+const board = new Board(); 
+scene.add(board.group)
 
 window.addEventListener('resize', () =>
 {

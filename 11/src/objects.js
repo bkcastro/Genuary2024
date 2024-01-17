@@ -108,9 +108,6 @@ class Boxes{
             
         }
 
-
-
-
         this.group.scale.set(.4, .4, .4)
 
         //for (var i = 0; i < )
@@ -119,10 +116,50 @@ class Boxes{
 
 class Rectangles {
     constructor() {
-        
+        this.group = new THREE.Group();
+        const material = new THREE.MeshPhysicalMaterial()
+        material.color = new THREE.Color("#ff204d")
+        material.metalness = 0
+        material.transmission = 1
+        material.ior = 1.5
+        material.thickness = 0.5
+        material.roughness = 0.3
+
+        const geometry = new THREE.BoxGeometry(5, 3, 0.5) 
+
+        const mesh = new THREE.Mesh(geometry, material) 
+
+        this.group.add(mesh)
+    }
+}
+
+class Board {
+    constructor(size=10) {
+        this.group = new THREE.Group() 
+
+        const geometry = new THREE.BoxGeometry(1, 1, 1)
+        const material = new THREE.MeshPhysicalMaterial()
+        material.color = new THREE.Color("#ff204d")
+        material.metalness = 0
+        material.transmission = 1
+        material.ior = 1.5
+        material.thickness = 0.5
+        material.roughness = 0.3
+
+        for (var i = -size; i <= size; i++) {
+            for (var j = -size; j <= size; j++) {
+
+                const mesh = new THREE.Mesh(geometry, material); 
+                 
+                mesh.position.set(i, 0, j); 
+                this.group.add(mesh)
+            }
+        }
+    }
+    animation() {
+
     }
 }
 
 
-
-export {Core, Stripes, Boxes}
+export {Core, Stripes, Boxes, Board}
