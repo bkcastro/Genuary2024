@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+
 import GUI from 'lil-gui'
 
 import vertex from './shaders/vertex.glsl'
@@ -182,6 +184,9 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.xr.enabled = true;
+
+document.body.appendChild( VRButton.createButton( renderer ) );
 
 generateGalaxy()
 
@@ -200,25 +205,16 @@ const radius = 10; // radius of the circle
 let angle = .5; // start angle
 const speed = 0.001 / 2; // rotation speed
 
-const tick = () =>
-{
+
+renderer.setAnimationLoop( function () {
+
     const elapsedTime = clock.getElapsedTime()
 
     material.uniforms.uTime.value = elapsedTime;
     // Update controls
     controls.update()
 
-    // Update camera position
-    camera.position.x = radius * Math.cos(angle);
-    camera.position.z = radius * Math.sin(angle);
-    
-    angle += speed;
 
-    // Render
-    renderer.render(scene, camera)
+	renderer.render( scene, camera );
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
-}
-
-tick()
+} );
