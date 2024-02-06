@@ -45,6 +45,7 @@ var n = 5
 const angle = (2 * Math.PI) / n
 var theta = 0;
 const radius = 5;
+const planes = [];
 
 for (let i = 0; i < n; i++) {
 
@@ -52,7 +53,7 @@ for (let i = 0; i < n; i++) {
     plane.position.set(Math.cos(theta) * radius, 0, Math.sin(theta) * radius);
 
     plane.lookAt(new THREE.Vector3(0, 0, 0))
-
+    planes.push(plane)
     scene.add(plane)
 
     theta += angle
@@ -91,8 +92,18 @@ const clock = new THREE.Clock()
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
+    theta += .01
+
+    planes.forEach((plane) => {
+        plane.position.set(Math.cos(theta) * radius, 0, Math.sin(theta) * radius);
+        plane.lookAt(new THREE.Vector3(0, 0, 0))
+        theta += angle
+        console.log("hi")
+    })
+
     // Render
     renderer.render(scene, camera)
+
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
