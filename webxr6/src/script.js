@@ -22,13 +22,13 @@ const scene = new THREE.Scene()
 const parameters = {}
 parameters.count = 100000
 parameters.size = .01
-parameters.radius = 1
-parameters.branches = 10
+parameters.radius = 6.31
+parameters.branches = 80
 parameters.spin = 1
-parameters.randomness = 1
+parameters.randomness = 0.08
 parameters.randomnessPower = .01
-parameters.insideColor = '#fef3f3'//'#0d0909'
-parameters.outsideColor = '#000000' //'#95e8e6'
+parameters.insideColor = '#36dede'//'#0d0909'
+parameters.outsideColor = '#f21ee2' //'#95e8e6'
 parameters.translate = [0, 0, 0];
 
 let geometry = null
@@ -120,7 +120,8 @@ const generateGalaxy = () => {
      */
     points = new THREE.Points(geometry, material)
 
-    points.position.set(0, 0, 4);
+    points.position.set(0, 0, 0);
+    points.scale.set(.1, .1, .1);
 
     //points.rotateX(Math.PI/10)
     scene.add(points)
@@ -199,7 +200,7 @@ renderer.setAnimationLoop(function () {
     const elapsedTime = clock.getElapsedTime()
 
     if (elapsedTime < 100) {
-        material.uniforms.uTime.value = elapsedTime / 30;
+        material.uniforms.uTime.value = elapsedTime / 10;
     }
 
 

@@ -24,7 +24,7 @@ void main()
 
     modelPosition.x = cos(angle) * distanceToCenter; 
     modelPosition.y = sin(angle) * distanceToCenter;
-    modelPosition.z = cos(angle) * distanceToCenter;
+    modelPosition.z = tan(angle) * distanceToCenter;
 
 
     modelPosition.x += aRandom.x; 
