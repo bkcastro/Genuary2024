@@ -41,7 +41,7 @@ const helper = new THREE.AxesHelper(10, 10)
 scene.add(helper)
 
 
-var n = 5
+var n = 6
 const angle = (2 * Math.PI) / n
 var theta = 0;
 const radius = 5;
@@ -49,7 +49,7 @@ const planes = [];
 
 for (let i = 0; i < n; i++) {
 
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), new THREE.MeshBasicMaterial({ color: "red" }));
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), new THREE.MeshBasicMaterial({ color: "red", }));
     plane.position.set(Math.cos(theta) * radius, 0, Math.sin(theta) * radius);
 
     plane.lookAt(new THREE.Vector3(0, 0, 0))
@@ -59,14 +59,13 @@ for (let i = 0; i < n; i++) {
     theta += angle
 }
 
-
 /**
  * Camera
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 8
-camera.position.y = 1
+camera.position.x = 0
+camera.position.y = 0
 camera.position.z = 0
 
 scene.add(camera)
@@ -92,14 +91,16 @@ const clock = new THREE.Clock()
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
-    theta += .01
+    // theta += .002
 
-    planes.forEach((plane) => {
-        plane.position.set(Math.cos(theta) * radius, 0, Math.sin(theta) * radius);
-        plane.lookAt(new THREE.Vector3(0, 0, 0))
-        theta += angle
-        console.log("hi")
-    })
+    // planes.forEach((plane) => {
+    //     plane.position.set(Math.cos(theta) * radius, 0, Math.sin(theta) * radius);
+    //     plane.lookAt(new THREE.Vector3(0, 0, 0))
+    //     theta += angle
+    //     //console.log("hi")
+    // })'
+
+    camera.rotateY(.002)
 
     // Render
     renderer.render(scene, camera)
