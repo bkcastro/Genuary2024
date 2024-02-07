@@ -4,7 +4,6 @@ import { ARButton } from 'three/addons/webxr/ARButton.js';
 
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
-import { render } from 'react-dom';
 
 import GUI from 'lil-gui'
 
