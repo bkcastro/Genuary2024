@@ -1,4 +1,3 @@
-
 varying vec3 vColor;
 
 void main()
@@ -18,7 +17,7 @@ void main()
     strength  = 1.0 - strength;
     strength = pow(strength, 10.0);
 
-    vec3 color = mix(vec3(0.0), vColor, strength);
+    vec3 color = mix(vec3(0.0, 0.0, 0.0), vColor, 1.0);
 
     gl_FragColor = vec4(vec3(color), 1.0);
 

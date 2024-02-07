@@ -6,26 +6,31 @@ import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
 import { render } from 'react-dom';
 
+import GUI from 'lil-gui'
 
-// Canvas
-//const canvas = document.querySelector('canvas.webgl')
+// Debug
+const gui = new GUI()
+
 
 // Scene
 const scene = new THREE.Scene()
+
+scene.add(new THREE.AxesHelper(10, 10));
 
 /**
  * Galaxy
  */
 const parameters = {}
-parameters.count = 600000
-parameters.size = 0.005
-parameters.radius = 5
-parameters.branches = 40
+parameters.count = 100000
+parameters.size = .01
+parameters.radius = 1
+parameters.branches = 10
 parameters.spin = 1
-parameters.randomness = 0.1
-parameters.randomnessPower = 10
-parameters.insideColor = '#3cf440'
-parameters.outsideColor = '#0147eb'
+parameters.randomness = 1
+parameters.randomnessPower = .01
+parameters.insideColor = '#0d0909'
+parameters.outsideColor = '#95e8e6'
+parameters.translate = [0, 0, 0];
 
 let geometry = null
 let material = null
@@ -64,9 +69,9 @@ const generateGalaxy = () => {
         positions[i3 + 2] = Math.sin(branchAngle) * radius
 
         // Random 
-        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
-        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
-        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius
+        const randomX = (Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius) + parameters.translate[0]
+        const randomY = (Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius) + parameters.translate[0]
+        const randomZ = (Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius) + parameters.translate[0]
 
         random[i3] = randomX
         random[i3 + 1] = randomY
@@ -102,12 +107,12 @@ const generateGalaxy = () => {
 
     material = new THREE.ShaderMaterial({
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        //blending: THREE.AdditiveBlending,
         vertexColors: true,
         vertexShader: vertex,
         fragmentShader: fragment,
         uniforms: {
-            uSize: { value: 30 * renderer.getPixelRatio() },
+            uSize: { value: 10 * renderer.getPixelRatio() },
             uTime: { value: 0 },
         }
     })
@@ -119,6 +124,15 @@ const generateGalaxy = () => {
     //points.rotateX(Math.PI/10)
     scene.add(points)
 }
+
+gui.add(parameters, 'count').min(100).max(20000).step(100).onFinishChange(generateGalaxy)
+gui.add(parameters, 'radius').min(0.01).max(20).step(0.01).onFinishChange(generateGalaxy)
+gui.add(parameters, 'branches').min(2).max(100).step(1).onFinishChange(generateGalaxy)
+gui.add(parameters, 'randomness').min(0).max(2).step(0.001).onFinishChange(generateGalaxy)
+gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.001).onFinishChange(generateGalaxy)
+gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy)
+gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy)
+
 
 /**
  * Sizes
@@ -146,20 +160,12 @@ window.addEventListener('resize', () => {
  * Camera
  */
 // Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 30)
-// camera.position.x = 8
-// camera.position.y = 1
-// camera.position.z = 0
-// camera.lookAt(new THREE.Vector3(0, 0, 0))
-//scene.add(camera)
-
-// Controls
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
-
-/**
- * Renderer
- */
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000)
+camera.position.x = 20
+camera.position.y = 30
+camera.position.z = 10
+camera.lookAt(new THREE.Vector3(0, 0, 0))
+scene.add(camera)
 
 const container = document.createElement('div');
 document.body.appendChild(container);
@@ -169,16 +175,18 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 container.appendChild(renderer.domElement);
+renderer.setClearColor(new THREE.Color(0xffffFF));
 
 
 document.body.appendChild(ARButton.createButton(renderer));
 
-generateGalaxy()
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableDamping = true
 
-// setInterval(() => {
-//     parameters.radius += 0.1/10
-//     generateGalaxy()
-// }, 1000/30)
+scene.add(controls);
+
+generateGalaxy()
 
 /**
  * Animate
@@ -189,7 +197,12 @@ renderer.setAnimationLoop(function () {
 
     const elapsedTime = clock.getElapsedTime()
 
-    material.uniforms.uTime.value = elapsedTime;
+    if (elapsedTime < 100) {
+        material.uniforms.uTime.value = elapsedTime / 30;
+    }
+
+
+
     // Update controls
     //controls.update()
 
