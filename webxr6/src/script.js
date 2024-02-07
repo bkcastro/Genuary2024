@@ -14,7 +14,7 @@ const gui = new GUI()
 // Scene
 const scene = new THREE.Scene()
 
-scene.add(new THREE.AxesHelper(10, 10));
+//scene.add(new THREE.AxesHelper(10, 10));
 
 /**
  * Galaxy
@@ -27,8 +27,8 @@ parameters.branches = 10
 parameters.spin = 1
 parameters.randomness = 1
 parameters.randomnessPower = .01
-parameters.insideColor = '#0d0909'
-parameters.outsideColor = '#95e8e6'
+parameters.insideColor = '#fef3f3'//'#0d0909'
+parameters.outsideColor = '#000000' //'#95e8e6'
 parameters.translate = [0, 0, 0];
 
 let geometry = null
@@ -119,6 +119,8 @@ const generateGalaxy = () => {
      * Points
      */
     points = new THREE.Points(geometry, material)
+
+    points.position.set(0, 0, 4);
 
     //points.rotateX(Math.PI/10)
     scene.add(points)
