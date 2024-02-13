@@ -1,9 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-/**
- * Base
- */
+
 // Debug
 const gui = new GUI({ width: 340 })
 
@@ -14,8 +12,9 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 let geometry = new THREE.CylinderGeometry(3, 3, 1, 60, 60);
-const material = new THREE.MeshBasicMaterial({ color: 0xe21d1d });
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff40 });
 let mesh = new THREE.Mesh(geometry, material);
+
 mesh.rotateX(Math.PI / 2);
 scene.add(mesh);
 
@@ -46,15 +45,6 @@ material.onBeforeCompile = (shader) => {
             transformed.xz = rotateMatrix * transformed.yz;
         `
     )
-}
-
-let star = null;
-
-function generateStar() {
-
-    if (star != null) {
-
-    }
 }
 
 /**
@@ -99,16 +89,11 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
+renderer.setClearColor(0xffffff, 1); // Set background color to white
 /**
  * Animate
  */
 const clock = new THREE.Clock()
-
-
-let angle = 0
-const radius = 0.01
-const speed = 0.01 / 4
 
 let height = 1
 let goBack = false
@@ -116,14 +101,6 @@ const cap = 600;
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
-
-    // Calculate the camera's new position
-    // angle += speed;
-    // camera.position.x = Math.sin(angle) * radius;
-    // camera.position.z = Math.cos(angle) * radius;
-
-    // // Make the camera look at the center of the scene
-    // camera.lookAt(scene.position);
 
     scene.remove(mesh)
     geometry.dispose()
@@ -145,11 +122,10 @@ const tick = () => {
         }
     }
 
-    //console.log(height)
-
     geometry = new THREE.CylinderGeometry(10, 10, height, 50, 50)
     mesh = new THREE.Mesh(geometry, material)
     mesh.rotateX(Math.PI / 2);
+
     scene.add(mesh)
     // Update controls
     controls.update()
