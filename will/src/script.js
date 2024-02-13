@@ -102,6 +102,7 @@ const tick = () => {
 
     camera.rotateY(.002)
 
+
     // Render
     renderer.render(scene, camera)
 

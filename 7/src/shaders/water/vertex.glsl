@@ -13,6 +13,7 @@ varying vec3 vWorldPosition;
 varying float vElevation;
 // Classic Perlin 3D Noise 
 // by Stefan Gustavson
+//
 
 vec4 permute(vec4 x)
 {
@@ -113,12 +114,13 @@ void main()
         elevation -= abs(cnoise(vec3(modelPosition.xz * uSmallWavesFrequency * i, uTime * uSmallWavesSpeed)) * uSmallWavesElevation / i);
     }
     modelPosition.y = elevation;
+    
 
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
     gl_Position = projectedPosition;
 
-    gl_PointSize = 3.0; // Set the point size
+    gl_PointSize = 1.0; // Set the point size
 
     // Varings 
     vElevation = elevation;

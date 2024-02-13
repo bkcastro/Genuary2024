@@ -7,9 +7,9 @@ import waterVertexShader from './shaders/water/vertex.glsl'
 import waterFragmentShader from './shaders/water/fragment.glsl'
 
 function generateRandomColor() {
-    const r = Math.random()/2;
-    const g = Math.random()/2;
-    const b = Math.random()/2;
+    const r = Math.random() / 2;
+    const g = Math.random() / 2;
+    const b = Math.random() / 2;
     return new THREE.Color(r, g, b);
 }
 
@@ -27,19 +27,9 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-// Fog 
-const color = '#bbbbbb'; // Fog color
-const near = 1; // Minimum range at which the fog starts
-const far = 4; // Maximum range at which the fog completely obscures objects
 
-scene.fog = new THREE.Fog(color, near, far);
-
-/**
- * Water
- */
 // Geometry
-const waterGeometry = new THREE.PlaneGeometry(3, 3, 150, 150)
-
+const waterGeometry = new THREE.PlaneGeometry(10, 10, 180, 180)
 
 // Colors
 debugObject.depthColor = '#ab5454'
@@ -53,27 +43,23 @@ const waterMaterial = new THREE.ShaderMaterial({
     uniforms:
     {
         uTime: { value: 0 },
-        uBigWavesElevation: { value: 1 },
-        uBigWavesFrequency: { value: new THREE.Vector2(19, 19) },
-        uBigWavesSpeed: { value: 0.0 },
+        uBigWavesElevation: { value: 0.144 },
+        uBigWavesFrequency: { value: new THREE.Vector2(5.646, 2.939) },
+        uBigWavesSpeed: { value: 1.442 },
         uDepthColorOld: { value: new THREE.Color(debugObject.depthColor) },
         uSurfaceColorOld: { value: new THREE.Color(debugObject.surfaceColor) },
         uDepthColorNew: { value: generateRandomColor() },
         uSurfaceColorNew: { value: generateRandomColor() },
         uColorOffset: { value: .01 },
         uColorMultiplier: { value: 5 },
-        uSmallWavesElevation: { value: 0.2 },
-        uSmallWavesFrequency: { value: 19.0 },
-        uSmallWavesSpeed: { value: 1 },
-        uSmallIterations: { value: 3 },
-        fogColor: { value: new THREE.Color(color) }, 
-        fogNear: { value: near },
-        fogFar: { value: far },
+        uSmallWavesElevation: { value: 0.329 },
+        uSmallWavesFrequency: { value: 1.531 },
+        uSmallWavesSpeed: { value: 0.421 },
+        uSmallIterations: { value: 1 },
     },
     wireframe: true,
 })
 
-waterMaterial.fog = false;
 
 
 gui.add(waterMaterial.uniforms.uBigWavesElevation, 'value').min(0).max(1).step(0.001).name('uBigWavesElevation')
@@ -103,8 +89,7 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
+window.addEventListener('resize', () => {
     // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
@@ -138,34 +123,25 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setClearColor(0xffffff, 1); // Set background color to white
 
 /**
  * Animate
  */
 const clock = new THREE.Clock()
 
-setInterval( () => {
+setInterval(() => {
     waterMaterial.uniforms.uDepthColorNew.value.set(generateRandomColor())
     waterMaterial.uniforms.uSurfaceColorNew.value.set(generateRandomColor())
 }, 2000)
 
 
-let angle = 0 
+let angle = 0
 const radius = 0.01
-const speed = 0.01/2
+const speed = 0.01 / 2
 
-const tick = () =>
-{
+const tick = () => {
     const elapsedTime = clock.getElapsedTime()
-    
-    // Calculate the camera's new position
-    // angle += speed;
-    // camera.position.x = Math.sin(angle) * radius;
-    // camera.position.z = Math.cos(angle) * radius;
-
-    // Make the camera look at the center of the scene
-    //camera.lookAt(scene.position);
-
 
     waterMaterial.uniforms.uTime.value = elapsedTime
 
@@ -176,14 +152,14 @@ const tick = () =>
     // Render
     renderer.render(scene, camera)
 
-    setTimeout( function() {
+    setTimeout(function () {
 
-         // Call tick again on the next frame
+        // Call tick again on the next frame
         window.requestAnimationFrame(tick)
 
-    }, 1000 / 30 );
-   
-    
+    }, 1000 / 30);
+
+
 }
 
 tick()

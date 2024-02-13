@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { ARButton } from 'three/addons/webxr/ARButton.js';
+import { XRButton } from 'three/addons/webxr/XRButton.js';
 
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
@@ -22,7 +23,7 @@ const scene = new THREE.Scene()
 const parameters = {}
 parameters.count = 100000
 parameters.size = .01
-parameters.radius = 6.31
+parameters.radius = 1
 parameters.branches = 80
 parameters.spin = 1
 parameters.randomness = 0.08
@@ -111,7 +112,7 @@ const generateGalaxy = () => {
         vertexShader: vertex,
         fragmentShader: fragment,
         uniforms: {
-            uSize: { value: 10 * renderer.getPixelRatio() },
+            uSize: { value: 2 * renderer.getPixelRatio() },
             uTime: { value: 0 },
         }
     })
@@ -169,8 +170,7 @@ camera.position.z = 10
 camera.lookAt(new THREE.Vector3(0, 0, 0))
 scene.add(camera)
 
-const container = document.createElement('div');
-document.body.appendChild(container);
+const container = document.getElementById("container");
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -200,10 +200,8 @@ renderer.setAnimationLoop(function () {
     const elapsedTime = clock.getElapsedTime()
 
     if (elapsedTime < 100) {
-        material.uniforms.uTime.value = elapsedTime / 10;
+        material.uniforms.uTime.value = elapsedTime / 100;
     }
-
-
 
     // Update controls
     //controls.update()

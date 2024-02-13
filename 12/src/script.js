@@ -5,12 +5,9 @@ import GUI from 'lil-gui'
 import vertex from './shaders/vertex.glsl'
 import fragment from './shaders/fragment.glsl'
 
-/**
- * Base
- */
 // Debug
 const gui = new GUI({ width: 340 })
-//gui.hide()
+gui.hide()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -20,14 +17,6 @@ const scene = new THREE.Scene()
 
 const helper = new THREE.AxesHelper(10);
 scene.add(helper)
-
-const debugObject = {
-    color: "#ece2bd",
-    recColor: "#ece2bd"
-}
-
-// Set the background color of the scene
-scene.background = new THREE.Color(debugObject.color);
 
 /**
  * Sizes
@@ -51,7 +40,6 @@ const geometry = new THREE.BoxGeometry(1, 1, 1)
 const mesh = new THREE.Mesh(geometry, material)
 
 const cubes = []
-const group = new THREE.Group();
 
 function grid(width, height, padding) {
 
@@ -60,66 +48,37 @@ function grid(width, height, padding) {
             const clone = mesh.clone();
             clone.position.set(i * padding, j * padding, 0);
             cubes.push(clone)
-            //group.add(clone)
             scene.add(clone)
         }
     }
 }
 
 grid(6, 5, 4)
-//scene.add(group)
 
 window.addEventListener('resize', () => {
-    // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
-
-    //   // Update camera aspect ratio
-    //   camera.left = sizes.width / -2;
-    //   camera.right = sizes.width / 2;
-    //   camera.top = sizes.height / 2;
-    //   camera.bottom = sizesheight / -2;
-
-    // Update camera projection matrix
-    //camera.aspect = width / height;
     camera.updateProjectionMatrix();
 
-
-    // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
-/*
- * Camera
- */
-// Base camera
-// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-// camera.position.set(0, 1.3, 0)
-// scene.add(camera)
-
-const camera = new THREE.OrthographicCamera(sizes.width / -100, sizes.width / 100, sizes.height / 100, sizes.height / -100, 0.01, 100);
+const camera = new THREE.OrthographicCamera(sizes.width / -100, sizes.width / 100, sizes.height / 100, sizes.height / -100, 0.01, 1000);
 scene.add(camera)
 
-// Controls
 const controls = new OrbitControls(camera, canvas)
 camera.position.set(0, 0, 1)
 controls.enableDamping = true
 
-/**
- * Renderer
- */
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setClearColor(0xffffff, 0); // Set background color to white
 
-/**
- * Animate
- */
 const clock = new THREE.Clock()
-
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
